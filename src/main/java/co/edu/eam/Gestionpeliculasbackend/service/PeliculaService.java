@@ -17,7 +17,7 @@ public interface PeliculaService {
 
     public List<Pelicula> listarPeliculas();
 
-    public List<Pelicula> buscarPorGenero(String genero);
+    public List<Pelicula> buscarPorGenero(Long idGenero);
 
     public Pelicula buscarPorId(long id);
 

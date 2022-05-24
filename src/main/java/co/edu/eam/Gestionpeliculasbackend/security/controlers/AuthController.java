@@ -23,7 +23,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.Valid;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,6 +38,9 @@ import java.util.Set;
 @RequestMapping("/auth")
 @CrossOrigin
 public class AuthController {
+
+    @Autowired
+    EntityManager entityManager;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -59,9 +69,11 @@ public class AuthController {
             return new ResponseEntity(new Mensaje("Ya existe un usuario con este email"),HttpStatus.BAD_REQUEST);
         }
 
+        Date fechaCreacion= new Date();
+
         Usuario usuario=
                 new Usuario(nuevoUsuario.getNombre(),nuevoUsuario.getNombreUsuario(),nuevoUsuario.getEmail(),
-                        passwordEncoder.encode(nuevoUsuario.getPassword()),null);
+                        passwordEncoder.encode(nuevoUsuario.getPassword()),null,fechaCreacion);
 
         Set<Rol> roles= new HashSet<>();
         roles.add(rolService.getByRolNombre(RolNombre.ROLE_USER).get());
@@ -130,6 +142,21 @@ public class AuthController {
         usuario.setPassword(passwordEncoder.encode(newPassword));
         usuarioService.save(usuario);
         return new ResponseEntity(new Mensaje("Actualizo con exito la contraseña"),HttpStatus.CREATED);
+    }
+
+    @GetMapping("/usuarios/year/{year}")
+    public Long cantidadUsuariosMes(@PathVariable int year)  {
+        int yearTemporal= year;
+        Date fechaInicial= java.sql.Date.valueOf(yearTemporal+"-01-01");
+        Date fechaFinal=  java.sql.Date.valueOf(yearTemporal+"-12-31");
+//        System.out.println(fechaInicial);
+//        System.out.println(fechaFinal);
+        Query query= entityManager.createQuery("SELECT count (us.id) FROM Usuario us WHERE us.fecha_creacion>=:fechaInicial and us.fecha_creacion<=: fechaFinal");
+        query.setParameter("fechaInicial",fechaInicial);
+        query.setParameter("fechaFinal",fechaFinal);
+        Long numero= (Long)query.getSingleResult();
+        System.out.println(numero);
+        return numero;
     }
 
 

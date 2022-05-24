@@ -5,12 +5,14 @@ import lombok.Data;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
 @Entity
-public class Usuario {
+public class Usuario{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +33,9 @@ public class Usuario {
 
     private String nombre_imagen;
 
+    @Temporal(TemporalType.DATE)
+    private Date fecha_creacion;
+
     private String tokenPassword;
 
     @NotNull
@@ -42,12 +47,13 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(String nombre, String nombreUsuario, String email, String password,String nombre_imagen) {
+    public Usuario(String nombre, String nombreUsuario, String email, String password,String nombre_imagen, Date fecha_creacion) {
         this.nombre = nombre;
         this.nombreUsuario = nombreUsuario;
         this.email = email;
         this.password = password;
         this.nombre_imagen= nombre_imagen;
+        this.fecha_creacion= fecha_creacion;
     }
 
 }

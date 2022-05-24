@@ -61,10 +61,10 @@ public class ControladorPelicula implements PeliculaService {
     }
 
     @Override
-    @GetMapping("/peliculas/genero/{genero}")
-    public List<Pelicula> buscarPorGenero(@PathVariable String genero) {
-      Query query= entityManager.createQuery("SELECT pe FROM Pelicula pe WHERE pe.genero=:genero");
-      query.setParameter("genero",genero);
+    @GetMapping("/peliculas/genero/{idGenero}")
+    public List<Pelicula> buscarPorGenero(@PathVariable Long idGenero) {
+      Query query= entityManager.createQuery("SELECT pe FROM Pelicula pe WHERE pe.genero.id=:idGenero");
+      query.setParameter("idGenero",idGenero);
       return query.getResultList();
     }
 
@@ -76,6 +76,14 @@ public class ControladorPelicula implements PeliculaService {
         return query.getResultList();
     }
 
+    @GetMapping("/peliculas/contar/{estado}")
+    public Long contarPorEstado(@PathVariable String estado) {
+        Query query= entityManager.createQuery("SELECT count(pe.id) FROM Pelicula pe WHERE pe.estado=:estado");
+        query.setParameter("estado",estado);
+        Long cantidad= (Long)query.getSingleResult();
+        return cantidad;
+    }
+
     @Override
     @GetMapping("/peliculas/{id}")
     public Pelicula buscarPorId(@PathVariable long id) {
@@ -83,10 +91,20 @@ public class ControladorPelicula implements PeliculaService {
         return pelicula;
     }
 
+    @PutMapping("/peliculas/calificacion/{id}")
+    public void actualizarCalificacion( @RequestParam("calificacion") double nuevaCalificacion,@PathVariable Long id){
+        Pelicula pelicula= peliculaDao.findById(id).get();
+        pelicula.setTotalVotos(pelicula.getTotalVotos()+1);
+        pelicula.setCalificacion(pelicula.getCalificacion()+nuevaCalificacion);
+        peliculaDao.save(pelicula);
+    }
+
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/peliculas")
     public void guardarPelicula(@RequestBody Pelicula pelicula) {
+        pelicula.setTotalVotos(0);
+        pelicula.setCalificacion(0);
         peliculaDao.save(pelicula);
 
     }

@@ -22,8 +22,6 @@ public class Pelicula implements Serializable {
     @Size(min = 2, message = "Ingrese minimo 2 caracteres")
     private String titulo;
 
-    @NotEmpty
-    private String imagen;
 
     @NotEmpty(message = "Este campo no puede estar vacio")
     @Size(min = 5, message = "Ingrese minimo 5 caracteres")
@@ -42,12 +40,19 @@ public class Pelicula implements Serializable {
     private String descripcion;
 
     @NotEmpty(message = "Este campo es requerido")
-    @Size(min = 3, message = "Ingrese minimo 3 caracteres")
-    private String genero;
-
-    @NotEmpty(message = "Este campo es requerido")
     private String urlVideo;
 
     private String estado;
+
+    @NotEmpty
+    private String imagen;
+
+    private int totalVotos;
+
+    private double calificacion;
+
+    @ManyToOne
+    @JoinColumn(name= "genero_id")
+    private Genero genero;
 
 }
